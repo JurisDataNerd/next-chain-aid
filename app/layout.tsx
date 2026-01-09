@@ -3,6 +3,8 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
+import { Web3Provider } from "@/components/web3-provider"
+import { Navbar } from "@/components/navbar"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -37,9 +39,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="id">
-      <body className={`font-sans antialiased`}>
-        {children}
+    <html lang="id" suppressHydrationWarning>
+      <body className={`font-sans antialiased`} suppressHydrationWarning>
+        <Web3Provider>
+          <Navbar />
+          {children}
+        </Web3Provider>
         <Analytics />
       </body>
     </html>
