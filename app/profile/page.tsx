@@ -111,12 +111,14 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50/50 via-white to-slate-50/50 py-12 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Profil Saya</h1>
-          <p className="text-slate-600 mt-1">Kelola informasi akun Anda</p>
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-transparent">
+            Profil Saya
+          </h1>
+          <p className="text-slate-600">Kelola informasi akun Anda</p>
         </div>
 
         {/* Profile Info Card */}
@@ -207,7 +209,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
                 <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-300"
                   onClick={() => router.push('/register-org')}
                 >
                   <Building2 className="w-4 h-4 mr-2" />
@@ -273,7 +275,7 @@ export default function ProfilePage() {
                   </Badge>
                 </div>
                 <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-300"
                   onClick={() => router.push('/org')}
                 >
                   <Building2 className="w-4 h-4 mr-2" />
@@ -303,7 +305,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-300"
                   onClick={() => router.push('/register-org')}
                 >
                   <Building2 className="w-4 h-4 mr-2" />

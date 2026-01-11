@@ -153,53 +153,61 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50/50 via-white to-slate-50/50 py-12 px-4">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Riwayat Donasi</h1>
-          <p className="text-slate-600 mt-1">Lihat semua kontribusi Anda untuk berbagai campaign</p>
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-transparent">
+            Riwayat Donasi
+          </h1>
+          <p className="text-slate-600">Lihat semua kontribusi Anda untuk berbagai campaign</p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
+          <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Total Donasi</p>
-                  <p className="text-2xl font-bold text-slate-900 mt-1">{stats.totalDonations}</p>
+                  <p className="text-3xl font-bold bg-gradient-to-br from-blue-600 to-blue-700 bg-clip-text text-transparent mt-1">
+                    {stats.totalDonations}
+                  </p>
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-blue-600" />
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center shadow-sm">
+                  <Heart className="w-7 h-7 text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Total Kontribusi</p>
-                  <p className="text-2xl font-bold text-slate-900 mt-1">{stats.totalAmount.toFixed(4)} ETH</p>
+                  <p className="text-3xl font-bold bg-gradient-to-br from-green-600 to-green-700 bg-clip-text text-transparent mt-1">
+                    {stats.totalAmount.toFixed(4)} ETH
+                  </p>
                 </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
+                <div className="w-14 h-14 bg-gradient-to-br from-green-50 to-green-100 rounded-xl flex items-center justify-center shadow-sm">
+                  <TrendingUp className="w-7 h-7 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Campaign Didukung</p>
-                  <p className="text-2xl font-bold text-slate-900 mt-1">{stats.campaignsSupported}</p>
+                  <p className="text-3xl font-bold bg-gradient-to-br from-purple-600 to-purple-700 bg-clip-text text-transparent mt-1">
+                    {stats.campaignsSupported}
+                  </p>
                 </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-purple-600" />
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl flex items-center justify-center shadow-sm">
+                  <Calendar className="w-7 h-7 text-purple-600" />
                 </div>
               </div>
             </CardContent>

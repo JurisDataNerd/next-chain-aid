@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { Campaign } from "@/lib/mock-campaigns"
+import type { Campaign, Donation } from "@/lib/types"
 import { DonationCard } from "./donation-card"
 import { ProgressUpdates } from "./progress-updates"
 import { FundsDistribution } from "./funds-distribution"
@@ -14,19 +14,40 @@ import { ChevronLeft } from "lucide-react"
 import Link from "next/link"
 
 const categoryColorMap: Record<string, string> = {
-  Disaster: "bg-red-100 text-red-800",
-  Pendidikan: "bg-blue-100 text-blue-800",
-  Kesehatan: "bg-green-100 text-green-800",
-  Lingkungan: "bg-emerald-100 text-emerald-800",
-  Sosial: "bg-purple-100 text-purple-800",
+  bencana_alam: "bg-red-100 text-red-800",
+  pendidikan: "bg-blue-100 text-blue-800",
+  kesehatan: "bg-green-100 text-green-800",
+  lingkungan: "bg-emerald-100 text-emerald-800",
+  sosial: "bg-purple-100 text-purple-800",
+  ekonomi: "bg-yellow-100 text-yellow-800",
+  lainnya: "bg-gray-100 text-gray-800",
+}
+
+const categoryLabelMap: Record<string, string> = {
+  bencana_alam: "Bencana Alam",
+  pendidikan: "Pendidikan",
+  kesehatan: "Kesehatan",
+  lingkungan: "Lingkungan",
+  sosial: "Sosial",
+  ekonomi: "Ekonomi",
+  lainnya: "Lainnya",
 }
 
 interface CampaignDetailContentProps {
-  campaign: Campaign
+  campaign: Campaign & {
+    collected_amount?: number
+    donor_count?: number
+    target_amount_eth?: number
+    balance?: number
+    blockchain_donations?: Donation[]
+  }
 }
 
 export function CampaignDetailContent({ campaign }: CampaignDetailContentProps) {
-  const percentage = Math.round((campaign.collected / campaign.target) * 100)
+  // Calculate percentage - use ETH amount if available, otherwise use IDR
+  const collected = campaign.collected_amount || 0
+  const target = campaign.target_amount_eth || campaign.target_amount || 1
+  const percentage = Math.min(100, Math.round((collected / target) * 100))
 
   return (
     <main className="min-h-screen bg-background">
@@ -40,13 +61,20 @@ export function CampaignDetailContent({ campaign }: CampaignDetailContentProps) 
 
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden bg-slate-900">
-        <Image src={campaign.image || "/placeholder.svg"} alt={campaign.title} fill className="object-cover" />
+        <Image 
+          src={campaign.image_url || "/placeholder.svg"} 
+          alt={campaign.title} 
+          fill 
+          className="object-cover" 
+        />
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 lg:p-12">
           <div className="max-w-4xl">
-            <Badge className={`${categoryColorMap[campaign.category]} border-0 mb-4 w-fit`}>{campaign.category}</Badge>
+            <Badge className={`${categoryColorMap[campaign.category] || categoryColorMap.lainnya} border-0 mb-4 w-fit`}>
+              {categoryLabelMap[campaign.category] || campaign.category}
+            </Badge>
             <h1 className="text-4xl sm:text-5xl font-bold text-white text-balance mb-2">{campaign.title}</h1>
-            <p className="text-lg text-slate-200">{campaign.organization}</p>
+            <p className="text-lg text-slate-200">{campaign.organization?.name || 'Organisasi'}</p>
           </div>
         </div>
       </div>
@@ -59,7 +87,7 @@ export function CampaignDetailContent({ campaign }: CampaignDetailContentProps) 
             {/* Description */}
             <Card className="p-6">
               <h2 className="text-2xl font-bold text-blue-950 mb-4">Tentang Campaign</h2>
-              <p className="text-slate-700 leading-relaxed">{campaign.fullDescription}</p>
+              <p className="text-slate-700 leading-relaxed whitespace-pre-line">{campaign.description}</p>
             </Card>
 
             {/* Tabs */}
@@ -71,20 +99,29 @@ export function CampaignDetailContent({ campaign }: CampaignDetailContentProps) 
               </TabsList>
 
               <TabsContent value="updates" className="space-y-6">
-                <ProgressUpdates updates={campaign.updates} />
+                <ProgressUpdates campaignId={campaign.id} />
               </TabsContent>
 
               <TabsContent value="distribution" className="space-y-6">
-                <FundsDistribution distributions={campaign.distributions} />
+                <FundsDistribution campaignId={campaign.id} contractAddress={campaign.contract_address} />
               </TabsContent>
 
               <TabsContent value="donors" className="space-y-6">
-                <DonorList donors={campaign.donors} />
+                <DonorList 
+                  campaignId={campaign.id} 
+                  contractAddress={campaign.contract_address}
+                  blockchainDonations={campaign.blockchain_donations}
+                />
               </TabsContent>
             </Tabs>
 
             {/* Blockchain Verification */}
-            <BlockchainVerification campaignId={campaign.id} />
+            {campaign.contract_address && (
+              <BlockchainVerification 
+                campaignId={campaign.id} 
+                contractAddress={campaign.contract_address}
+              />
+            )}
           </div>
 
           {/* Right Column - Sticky */}

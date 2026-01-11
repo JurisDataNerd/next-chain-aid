@@ -33,9 +33,9 @@ export async function getCampaigns(
     .from('campaigns')
     .select(`
       *,
-      organization:organizations(
+      organization:organizations!campaigns_creator_id_fkey(
         *,
-        profile:profiles(*)
+        profile:profiles!organizations_id_fkey(*)
       )
     `, { count: 'exact' })
 
@@ -81,14 +81,11 @@ export async function getCampaignById(id: string): Promise<Campaign | null> {
     .from('campaigns')
     .select(`
       *,
-      organization:organizations(
+      organization:organizations!campaigns_creator_id_fkey(
         *,
-        profile:profiles(*)
+        profile:profiles!organizations_id_fkey(*)
       ),
-      updates:campaign_updates(
-        *,
-        author:profiles(*)
-      )
+      updates:campaign_updates(*)
     `)
     .eq('id', id)
     .single()
@@ -107,9 +104,9 @@ export async function getActiveCampaigns(limit: number = 6): Promise<Campaign[]>
     .from('campaigns')
     .select(`
       *,
-      organization:organizations(
+      organization:organizations!campaigns_creator_id_fkey(
         *,
-        profile:profiles(*)
+        profile:profiles!organizations_id_fkey(*)
       )
     `)
     .eq('status', 'active')

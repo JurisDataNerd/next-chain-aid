@@ -24,7 +24,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
 import { 
   ArrowLeft, 
   Calendar, 
@@ -83,6 +82,11 @@ export default function CampaignReviewPage() {
         getCurrentProfile()
       ])
       
+      if (!campaignData) {
+        toast.error("Campaign tidak ditemukan")
+        return
+      }
+
       setCampaign(campaignData)
       setCurrentAdmin(adminProfile)
 
@@ -298,7 +302,7 @@ export default function CampaignReviewPage() {
                 </div>
                 <div className="space-y-1">
                   <span className="text-xs text-muted-foreground">Pembuat</span>
-                  <p className="font-semibold">{campaign.creator?.full_name || '-'}</p>
+                  <p className="font-semibold">{campaign.organization?.profile?.full_name || campaign.organization?.name || '-'}</p>
                 </div>
               </div>
             </CardContent>
@@ -508,7 +512,7 @@ export default function CampaignReviewPage() {
               )}
 
               {/* Action History Info */}
-              {campaign.status === 'rejected' && (
+              {campaign.rejection_reason && (
                 <div className="bg-red-50 p-4 rounded-lg border border-red-200">
                   <h4 className="font-semibold text-red-900 text-sm mb-1">Ditolak</h4>
                   <p className="text-sm text-red-800">{campaign.rejection_reason}</p>

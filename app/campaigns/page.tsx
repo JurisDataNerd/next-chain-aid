@@ -1,30 +1,83 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Search, Filter } from "lucide-react"
+import { useState, useMemo, useEffect } from "react"
+import { Search, Filter, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
 import { CampaignCard } from "@/components/campaigns/campaign-card"
 import { FilterSidebar } from "@/components/campaigns/filter-sidebar"
-import { campaignsData } from "@/lib/mock-campaigns"
+import { getCampaigns } from "@/lib/api"
+import { getCampaignSummary, weiToEth } from "@/lib/blockchain"
 import Link from "next/link"
+import type { Campaign } from "@/lib/types"
+import { toast } from "sonner"
 
 const ITEMS_PER_PAGE = 6
 
 export default function CampaignsPage() {
+  const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const [selectedStatus, setSelectedStatus] = useState<string | null>("active")
   const [sortBy, setSortBy] = useState("terbaru")
   const [currentPage, setCurrentPage] = useState(1)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
+  useEffect(() => {
+    loadCampaigns()
+  }, [])
+
+  const loadCampaigns = async () => {
+    try {
+      console.log('Fetching campaigns...')
+      
+      // Fetch all campaigns first (don't filter by status in API call)
+      const response = await getCampaigns({}, { limit: 100 })
+      console.log('Campaigns response:', response)
+      
+      // Filter only active campaigns on client side
+      const activeCampaigns = response.data.filter(c => c.status === 'active')
+      console.log('Active campaigns:', activeCampaigns.length)
+
+      // Fetch blockchain data for campaigns with contract addresses
+      const campaignsWithBlockchain = await Promise.all(
+        activeCampaigns.map(async (campaign) => {
+          if (campaign.contract_address) {
+            try {
+              const summary = await getCampaignSummary(campaign.contract_address)
+              return {
+                ...campaign,
+                collected_amount: summary.collectedAmount ? parseFloat(weiToEth(summary.collectedAmount)) : 0,
+                donor_count: summary.donorCount || 0,
+                target_amount_eth: summary.targetAmount ? parseFloat(weiToEth(summary.targetAmount)) : 0,
+              }
+            } catch (error) {
+              console.error(`Failed to fetch blockchain data for ${campaign.id}:`, error)
+              return campaign
+            }
+          }
+          return campaign
+        })
+      )
+
+      console.log('Campaigns with blockchain:', campaignsWithBlockchain.length)
+      setCampaigns(campaignsWithBlockchain)
+    } catch (error: any) {
+      console.error('Error loading campaigns:', error)
+      console.error('Error details:', error.message, error.stack)
+      toast.error(`Gagal memuat campaign: ${error.message || 'Unknown error'}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const filteredCampaigns = useMemo(() => {
-    const filtered = campaignsData.filter((campaign) => {
+    const filtered = campaigns.filter((campaign) => {
       const matchesSearch =
         campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        campaign.organization.toLowerCase().includes(searchQuery.toLowerCase())
+        campaign.organization?.name.toLowerCase().includes(searchQuery.toLowerCase())
 
       const matchesCategory = !selectedCategory || campaign.category === selectedCategory
       const matchesStatus = !selectedStatus || campaign.status === selectedStatus
@@ -35,18 +88,22 @@ export default function CampaignsPage() {
     // Sort
     switch (sortBy) {
       case "terbaru":
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
         break
       case "populer":
-        filtered.sort((a, b) => b.donorCount - a.donorCount)
+        filtered.sort((a, b) => (b.donor_count || 0) - (a.donor_count || 0))
         break
       case "deadline":
-        filtered.sort((a, b) => a.daysRemaining - b.daysRemaining)
+        filtered.sort((a, b) => {
+          const aDate = a.end_date ? new Date(a.end_date).getTime() : Infinity
+          const bDate = b.end_date ? new Date(b.end_date).getTime() : Infinity
+          return aDate - bDate
+        })
         break
     }
 
     return filtered
-  }, [searchQuery, selectedCategory, selectedStatus, sortBy])
+  }, [campaigns, searchQuery, selectedCategory, selectedStatus, sortBy])
 
   const totalPages = Math.ceil(filteredCampaigns.length / ITEMS_PER_PAGE)
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE
@@ -57,14 +114,38 @@ export default function CampaignsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-slate-50/50 via-white to-slate-50/50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative">
+            <Loader2 className="w-16 h-16 animate-spin text-blue-600 mx-auto mb-6" />
+            <div className="absolute inset-0 w-16 h-16 mx-auto bg-blue-400/20 rounded-full blur-xl animate-pulse" />
+          </div>
+          <p className="text-lg text-slate-600 font-medium">Memuat campaign...</p>
+          <p className="text-sm text-slate-500 mt-2">Mengambil data dari blockchain</p>
+        </div>
+      </main>
+    )
+  }
+
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50/50 via-white to-slate-50/50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-50 to-white border-b border-slate-200 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl font-bold text-blue-950 mb-2">Jelajahi Campaign</h1>
-          <p className="text-lg text-slate-600">
-            Temukan campaign yang ingin Anda dukung dan lihat dampak kontribusi Anda
+      <div className="relative bg-gradient-to-br from-blue-50/80 via-purple-50/40 to-white border-b border-slate-200/50 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl" />
+        
+        <div className="relative z-10 max-w-7xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-blue-200/50 shadow-sm mb-6">
+            <span className="text-sm font-medium text-blue-900">💙 Temukan Campaign Pilihan Anda</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-br from-blue-900 via-blue-700 to-purple-700 bg-clip-text text-transparent mb-4">
+            Jelajahi Campaign
+          </h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Temukan campaign yang ingin Anda dukung dan lihat dampak kontribusi Anda secara transparan
           </p>
         </div>
       </div>

@@ -89,22 +89,28 @@ export function Navbar() {
   }
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+    <nav className="border-b border-slate-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/80 sticky top-0 z-50 shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-8 mx-auto max-w-7xl">
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <ShieldCheck className="h-6 w-6 text-blue-600" />
-            <span>ChainAid</span>
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl group">
+            <div className="relative">
+              <ShieldCheck className="h-6 w-6 text-blue-600 group-hover:text-blue-700 transition-colors" />
+              <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-md group-hover:blur-lg transition-all" />
+            </div>
+            <span className="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">ChainAid</span>
           </Link>
-          <div className="hidden md:flex items-center gap-6 ml-10 text-sm font-medium text-muted-foreground">
-            <Link href="/campaigns" className="hover:text-primary transition-colors">
+          <div className="hidden md:flex items-center gap-6 ml-10 text-sm font-medium text-slate-600">
+            <Link href="/campaigns" className="hover:text-blue-600 transition-colors relative group">
               Donasi
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
             </Link>
-            <Link href="/transparansi" className="hover:text-primary transition-colors">
+            <Link href="/transparansi" className="hover:text-blue-600 transition-colors relative group">
               Transparansi
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
             </Link>
-            <Link href="/about" className="hover:text-primary transition-colors">
+            <Link href="/about" className="hover:text-blue-600 transition-colors relative group">
               Tentang Kami
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
             </Link>
           </div>
         </div>
@@ -179,10 +185,10 @@ export function Navbar() {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" asChild className="hidden sm:inline-flex">
+              <Button variant="ghost" asChild className="hidden sm:inline-flex hover:bg-blue-50 hover:text-blue-700">
                 <Link href="/login">Masuk</Link>
               </Button>
-              <Button asChild className="bg-blue-600 hover:bg-blue-700">
+              <Button asChild className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-300">
                 <Link href="/register">Daftar</Link>
               </Button>
             </div>
