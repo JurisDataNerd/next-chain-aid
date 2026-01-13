@@ -58,72 +58,19 @@ export default function HistoryPage() {
         return
       }
 
-      // TODO: Fetch donation history from blockchain
-      // For now, using mock data
-      const mockDonations: DonationHistory[] = [
-        {
-          id: "1",
-          campaign_id: "camp-1",
-          campaign_title: "Bantu Pendidikan Anak Kurang Mampu",
-          amount: 0.05,
-          message: "Semoga bermanfaat untuk pendidikan anak-anak",
-          timestamp: Date.now() - 86400000 * 2,
-          tx_hash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-          campaign: {
-            id: "camp-1",
-            title: "Bantu Pendidikan Anak Kurang Mampu",
-            image_url: "/diverse-students-learning.png",
-            organization: {
-              name: "Yayasan Pendidikan Indonesia"
-            }
-          }
-        },
-        {
-          id: "2",
-          campaign_id: "camp-2",
-          campaign_title: "Bantuan Korban Bencana Alam",
-          amount: 0.1,
-          message: "Semoga cepat pulih",
-          timestamp: Date.now() - 86400000 * 5,
-          tx_hash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-          campaign: {
-            id: "camp-2",
-            title: "Bantuan Korban Bencana Alam",
-            image_url: "/diverse-students-learning.png",
-            organization: {
-              name: "Gerakan Peduli Bencana"
-            }
-          }
-        },
-        {
-          id: "3",
-          campaign_id: "camp-3",
-          campaign_title: "Renovasi Rumah Sakit Daerah",
-          amount: 0.03,
-          message: "",
-          timestamp: Date.now() - 86400000 * 10,
-          tx_hash: "0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456",
-          campaign: {
-            id: "camp-3",
-            title: "Renovasi Rumah Sakit Daerah",
-            image_url: "/diverse-students-learning.png",
-            organization: {
-              name: "Klinik Kesehatan Masyarakat"
-            }
-          }
-        }
-      ]
-
-      setDonations(mockDonations)
-
-      // Calculate stats
-      const totalAmount = mockDonations.reduce((sum, d) => sum + d.amount, 0)
-      const uniqueCampaigns = new Set(mockDonations.map(d => d.campaign_id)).size
-
+      // TODO: Fetch donation history from blockchain based on user's wallet address
+      // This requires:
+      // 1. User to connect their wallet (MetaMask)
+      // 2. Get all donations from blockchain where donor address matches user's wallet
+      // 3. Match with campaigns from database
+      
+      // For now, show empty state
+      setDonations([])
+      
       setStats({
-        totalDonations: mockDonations.length,
-        totalAmount,
-        campaignsSupported: uniqueCampaigns,
+        totalDonations: 0,
+        totalAmount: 0,
+        campaignsSupported: 0,
       })
     } catch (error) {
       console.error('Error loading donation history:', error)

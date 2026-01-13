@@ -4,7 +4,7 @@ import {
   getCampaignDonations,
   getCampaignWithdrawals,
   weiToEth,
-  getProvider,
+  getReadProvider,
 } from '@/lib/blockchain'
 import type { BlockchainTransaction } from '@/lib/types'
 
@@ -178,7 +178,7 @@ export async function getCampaignBlockchainStatus(contractAddress: string) {
  */
 export async function getNetworkStatus() {
   try {
-    const provider = getProvider()
+    const provider = getReadProvider()
     const network = await provider.getNetwork()
     const blockNumber = await provider.getBlockNumber()
     

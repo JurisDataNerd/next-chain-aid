@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import type { Campaign } from "@/lib/mock-campaigns"
+import type { Campaign } from "@/lib/types"
 import { CheckCircle2, Share2, ExternalLink } from "lucide-react"
 
 interface SuccessScreenProps {

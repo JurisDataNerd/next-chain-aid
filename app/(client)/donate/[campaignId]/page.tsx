@@ -1,13 +1,15 @@
 "use client"
 
 // 1. Import 'use' dari react untuk unwrap params
-import { useState, use } from "react"
+import { useState, use, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { campaignsData } from "@/lib/mock-campaigns"
+import { getCampaignById } from "@/lib/api"
+import type { Campaign } from "@/lib/types"
 import { AmountSelection } from "@/components/donation/amount-selection"
 import { QrisPayment } from "@/components/donation/qris-payment"
 import { ProcessingPayment } from "@/components/donation/processing-payment"
 import { SuccessScreen } from "@/components/donation/success-screen"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export type DonationStep = "amount" | "payment" | "processing" | "success"
 
@@ -25,8 +27,8 @@ export default function DonatePage({ params }: { params: Promise<{ campaignId: s
   const resolvedParams = use(params)
   const campaignId = resolvedParams.campaignId
 
-  // Gunakan campaignId yang sudah di-unwrap untuk mencari campaign
-  const campaign = campaignsData.find((c) => c.id === campaignId)
+  const [campaign, setCampaign] = useState<Campaign | null>(null)
+  const [loading, setLoading] = useState(true)
   
   const [step, setStep] = useState<DonationStep>("amount")
   const [donationData, setDonationData] = useState<DonationData>({
@@ -36,6 +38,32 @@ export default function DonatePage({ params }: { params: Promise<{ campaignId: s
   })
   const [receiptNumber, setReceiptNumber] = useState("")
   const [txHash, setTxHash] = useState("")
+
+  useEffect(() => {
+    loadCampaign()
+  }, [campaignId])
+
+  const loadCampaign = async () => {
+    try {
+      const data = await getCampaignById(campaignId)
+      setCampaign(data)
+    } catch (error) {
+      console.error('Error loading campaign:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-lg space-y-4">
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      </main>
+    )
+  }
 
   if (!campaign) {
     return (
